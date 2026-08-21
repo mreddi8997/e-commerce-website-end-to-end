@@ -1,0 +1,21 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+  pre_build:
+    commands:
+      - cd frontend
+      - echo Installing dependencies...
+      - npm ci
+  build:
+    commands:
+      - echo Building the React production assets...
+      - npm run build
+  post_build:
+    commands:
+      - echo Uploading build output directly to S3...
+      - aws s3 sync build/ s3://simplylearn-store-431445718171-us-east-2-an --delete
+      # Optional: Invalidate CloudFront cache if using CloudFront in front of S3
+      # - aws cloudfront create-invalidation --distribution-id YOUR_DISTRIBUTION_ID --paths "/*"
