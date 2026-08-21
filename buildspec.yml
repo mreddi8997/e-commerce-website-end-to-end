@@ -13,7 +13,6 @@ phases:
   build:
     commands:
       - echo Navigating to application directory...
-      - cd frontend/react-app
       - echo Building React application...
       - npm run build
   post_build:
