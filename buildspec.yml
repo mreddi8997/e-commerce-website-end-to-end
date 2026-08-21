@@ -4,17 +4,19 @@ phases:
   install:
     runtime-versions:
       nodejs: 20
-   pre_build:
+  pre_build:
     commands:
       - echo Navigating to application directory...
       - cd frontend/react-app
-      - echo Installing dependencies with npm@5...
+      - echo Clean installing dependencies using package-lock.json...
       - npm ci
   build:
     commands:
+      - echo Navigating to application directory...
+      - cd frontend/react-app
       - echo Building React application...
       - npm run build
   post_build:
     commands:
       - echo Syncing build artifacts to S3...
-      - aws s3 sync build/ s3://simplylearn-store-431445718171-us-east-2-an --delete
+      - aws s3 sync frontend/react-app/build/ s3://simplylearn-store-431445718171-us-east-2-an --delete
