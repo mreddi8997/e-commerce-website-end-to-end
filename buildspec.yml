@@ -4,18 +4,20 @@ phases:
   install:
     runtime-versions:
       nodejs: 20
+    commands:
+      - echo Installing npm v5 globally...
+      - npm install -g npm@5
   pre_build:
     commands:
-      - cd frontend/react-app/
-      - echo Installing dependencies...
-      - npm ci
+      - echo Navigating to application directory...
+      - cd frontend/react-app
+      - echo Installing dependencies with npm@5...
+      - npm install
   build:
     commands:
-      - echo Building the React production assets...
+      - echo Building React application...
       - npm run build
   post_build:
     commands:
-      - echo Uploading build output directly to S3...
+      - echo Syncing build artifacts to S3...
       - aws s3 sync build/ s3://simplylearn-store-431445718171-us-east-2-an --delete
-      # Optional: Invalidate CloudFront cache if using CloudFront in front of S3
-      # - aws cloudfront create-invalidation --distribution-id YOUR_DISTRIBUTION_ID --paths "/*"
