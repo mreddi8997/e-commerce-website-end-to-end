@@ -1,0 +1,23 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - echo Installing npm v5 globally...
+      - npm install -g npm@5
+  pre_build:
+    commands:
+      - echo Navigating to application directory...
+      - cd frontend/react-app
+      - echo Installing dependencies with npm@5...
+      - npm install
+  build:
+    commands:
+      - echo Building React application...
+      - npm run build
+  post_build:
+    commands:
+      - echo Syncing build artifacts to S3...
+      - aws s3 sync build/ s3://simplylearn-store-431445718171-us-east-2-an --delete
