@@ -4,10 +4,7 @@ phases:
   install:
     runtime-versions:
       nodejs: 20
-    commands:
-      - echo Installing npm v5 globally...
-      - npm install -g npm@5
-  pre_build:
+   pre_build:
     commands:
       - echo Navigating to application directory...
       - cd frontend/react-app
