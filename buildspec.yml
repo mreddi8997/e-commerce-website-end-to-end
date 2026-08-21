@@ -6,7 +6,7 @@ phases:
       nodejs: 20
   pre_build:
     commands:
-      - cd frontend/react-app/src/
+      - cd frontend/react-app/
       - echo Installing dependencies...
       - npm ci
   build:
