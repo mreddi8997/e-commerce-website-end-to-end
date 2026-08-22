@@ -5,34 +5,32 @@ env:
     AWS_DEFAULT_REGION: "us-east-2"
     AWS_ACCOUNT_ID: "431445718171"
     IMAGE_REPO_NAME: "ecommerce/user-service"
-    IMAGE_TAG: "user-latest"
+    APP_VERSION: "v1.0.0"
+  exported-variables:
+    - REPOSITORY_URI
+    - IMAGE_TAG
 
 phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
-      - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
-      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_COMMIT_HASH | cut -c 1-7)
-      - IMAGE_TAG=${COMMIT_HASH:-latest}
-      - echo "export REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME" > /tmp/env_vars
-      - echo "export IMAGE_TAG=$COMMIT_HASH" >> /tmp/env_vars
-      - . /tmp/env_vars
+      - SHORT_HASH=$(echo ${CODEBUILD_RESOLVED_COMMIT_HASH:-$CODEBUILD_BUILD_NUMBER} | cut -c 1-7)
+      - export REPOSITORY_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME"
+      - export IMAGE_TAG="${APP_VERSION}-${SHORT_HASH}"
       - echo Target tag is $IMAGE_TAG
+
   build:
     commands:
-      - . /tmp/env_vars
       - echo Build started on $(date)
-      - echo Building the Docker image...
-      - cd services/product-service
-      - docker build -t $REPOSITORY_URI:latest .
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+      - docker build -t $REPOSITORY_URI:$IMAGE_TAG -t $REPOSITORY_URI:latest ./services/user-service
+
   post_build:
     commands:
-      - . /tmp/env_vars
       - echo Build completed on $(date)
-      - echo Pushing the Docker images to ECR...
-      - docker push $REPOSITORY_URI:latest
+      - echo Pushing tagged images to ECR...
       - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - echo Writing image definitions file for ECS / deployment...
-      - printf '[{"name":"%s","imageUri":"%s"}]' "$IMAGE_REPO_NAME" "$REPOSITORY_URI:$IMAGE_TAG" > imagedefinitions.json
+      - docker push $REPOSITORY_URI:latest
+      - |
+        printf '[{"name":"%s","imageUri":"%s"}]' "$IMAGE_REPO_NAME" "$REPOSITORY_URI:$IMAGE_TAG" > imagedefinitions.json
+
