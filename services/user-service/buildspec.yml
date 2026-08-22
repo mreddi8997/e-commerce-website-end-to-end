@@ -4,7 +4,7 @@ env:
   variables:
     AWS_DEFAULT_REGION: "us-east-2"
     AWS_ACCOUNT_ID: "431445718171"
-    IMAGE_REPO_NAME: "ecommerce/product-service"
+    IMAGE_REPO_NAME: "ecommerce/user-service"
     IMAGE_TAG: "user-latest"
 
 phases:
