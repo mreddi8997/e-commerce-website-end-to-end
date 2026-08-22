@@ -17,11 +17,11 @@ phases:
       - IMAGE_TAG=${COMMIT_HASH:-latest}
       - echo "export REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME" > env_vars
       - echo "export IMAGE_TAG=$COMMIT_HASH" >> env_vars
-      - source env_vars
+      - . ./env_vars
       - echo Target tag is $IMAGE_TAG
   build:
     commands:
-      - source env_vars
+      - . ./env_vars
       - echo Build started on $(date)
       - echo Building the Docker image...
       - cd services/product-service
@@ -29,7 +29,7 @@ phases:
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
-      - source env_vars
+      - . ./env_vars
       - echo Build completed on $(date)
       - echo Pushing the Docker images to ECR...
       - docker push $REPOSITORY_URI:latest
