@@ -18,11 +18,11 @@ phases:
       - if [ -n "$CODEBUILD_RESOLVED_COMMIT_HASH" ]; then TAG=$(echo $CODEBUILD_RESOLVED_COMMIT_HASH | cut -c 1-7); else TAG="build-$CODEBUILD_BUILD_NUMBER"; fi
       - echo "export REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME" > env_vars
       - echo "export IMAGE_TAG=$TAG" >> env_vars
-      - source env_vars
+      - "source env_vars"
       - echo "Targeting Image Tag: $IMAGE_TAG"
   build:
     commands:
-      - source env_vars
+      - "source env_vars"
       - echo Build started on $(date)
       - echo Building the Docker image...
       - cd services/product-service
@@ -30,7 +30,7 @@ phases:
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
-      - source env_vars
+      - "source env_vars"
       - echo Build completed on $(date)
       - echo Pushing the Docker images to ECR...
       - docker push $REPOSITORY_URI:latest
